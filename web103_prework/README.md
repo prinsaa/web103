@@ -40,7 +40,7 @@ Here's a walkthrough of implemented required features:
 
 <!-- Replace this with whatever GIF tool you used! -->
 
-GIF created with ... 👉🏿 ![GIF tool here](https://ezgif.com/crop/ezgif-6-02477a3d37.gif)
+GIF created with ... 👉🏿 www.canva.com
 
 <!-- Recommended tools:
 [Kap](https://getkap.co/) for macOS
