@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Living by the Books</title>
+    <!-- Link to PicoCSS -->
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <main class="container-fluid" >
+    <h1 class="pico-color-pink-500 large-title">Living by the Books</h1>
+        <ul role="list">
+            <% books.forEach(function(book) { %>
+                <li style="margin-bottom: 1rem;">
+                    <article>
+                        <!-- Book Title -->
+                        <h2>
+                            <a href="/book/<%= book.id %>">
+                                <%= book.title %>
+                            </a>
+                        </h2>
+
+                        <!-- Book Image -->
+                        <img src="<%= book.imageUrl %>" alt="<%= book.title %>" style="width: 150px; height: auto;">
+
+                        <!-- Line break to separate content -->
+                        <p>Author: <%= book.author %>
+                        </p>
+                    </article>
+                </li>
+                <% }); %>
+        </ul>
+    </main>
+</body>
+
+
+</html>

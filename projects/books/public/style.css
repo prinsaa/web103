@@ -1,0 +1,41 @@
+/* Basic CSS to style the book list */
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #333;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #333;
+}
+
+img {
+    max-width: 200px;
+    height: auto;
+}
+
+.large-title {
+    font-size: 3rem;
+    /* Increase font size */
+    font-weight: bold;
+    /* You can adjust the weight as needed */
+    margin-bottom: 1rem;
+    /* Optional: Add some space below */
+}
