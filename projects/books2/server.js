@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const db = require('./db');
+const {insertBooks} = require('./db');
 
 const app = express();
 const PORT = 3000;
@@ -80,6 +81,19 @@ const booksData = [
   }
 ];
 
+// Insert books into the database when the server starts --> this was done twice and then commented out.
+const initializeDatabase = async () => {
+  try {
+    await insertBooks(booksData);
+    console.log('All books have been inserted successfully!');
+  } catch (error) {
+    console.error('Error inserting books:', error);
+  }
+};
+
+// Call the initialization function
+// initializeDatabase();
+
 
 // Route for the home page (rendering with EJS)
 app.get('/', async (req, res) => {
@@ -93,61 +107,65 @@ app.get('/', async (req, res) => {
   }
 });
 
+// Function to get a book by ID from the database
+const getBookById = async (id) => {
+  const queryText = 'SELECT * FROM books WHERE id = $1';
+  const values = [id];
+  
+  try {
+    const res = await db.query(queryText, values);
+    return res.rows[0]; // Return the first book found
+  } catch (error) {
+    console.error('Error fetching book:', error);
+    throw error; // Handle the error appropriately
+  }
+};
 
 // Route to get details for a specific book by ID
-app.get('/book/:id', (req, res) => {
-  const book = books.find(b => b.id === parseInt(req.params.id));
-  if (!book) {
-    return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+app.get('/book/:id', async (req, res) => {
+  const bookId = parseInt(req.params.id);
+  try {
+    const book = await getBookById(bookId);
+    
+    if (!book) {
+      return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+    }
+
+    res.send(`
+      <html>
+          <head>
+              <title>${book.title}</title>
+              <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+              <link rel="stylesheet" href="/style.css">
+              <style>
+              body {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  height: 100vh;
+                  margin: 0;
+              }
+              .container {
+                  text-align: center;
+              }
+              </style>
+          </head>
+
+          <body>
+              <main class="container">
+                  <h1>${book.title}</h1>
+                  <img src="${book.imageurl}" alt="${book.title}" style="width: 200px; height: auto;">
+                  <p><strong>Author:</strong> ${book.author}</p>
+                  <p>${book.description}</p>
+                  <p>If you're interested, you can <a href="${book.purchaseurl}" target="_blank">buy this book here</a>!</p>
+                  <a href="/" class="button-outline">Go back to the list</a>
+              </main>
+          </body>
+      </html>
+    `);
+  } catch (error) {
+    res.status(500).send('Internal Server Error');
   }
-  res.send(`
-    <html>
-        <head>
-            <title>${book.title}</title>
-            <!-- Link to PicoCSS (use CDN for easy setup) -->
-            <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
-            <link rel="stylesheet" href="/style.css">
-            <style>
-            
-            /* Additional CSS to center the container */
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh; /* Full viewport height */
-                margin: 0; /* Remove default body margin */
-            }
-            .container {
-                text-align: center; /* Center text inside the container */
-            }
-    </style>
-        </head>
-
-        <body>
-            <!-- PicoCSS Container -->
-            <main class="container">
-
-            <!-- Book Title -->
-            <h1>${book.title}</h1>
-
-            <!-- Book Image -->
-            <img src="${book.imageUrl}" alt="${book.title}" style="width: 200px; height: auto;">
-
-            <!-- Book Details -->
-            <p><strong>Author:</strong> ${book.author}</p>
-            <p>${book.description}</p>
-
-            <!-- Link to purchase the book -->
-            <p>If you're interested, you can <a href="${book.purchaseUrl}" target="_blank">buy this book here</a>!</p>
-
-            <!-- Back to List Button -->
-            <a href="/" class="button-outline">Go back to the list</a>
-
-            </main>
-        </body>
-    </html>
-
-  `);
 });
 
 // Handle 404 page

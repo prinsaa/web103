@@ -16,4 +16,26 @@ const pool = new Pool({
 // Export a query function
 const query = (text, params) => pool.query(text, params);
 
-module.exports = { query };
+// module.exports = { query };
+
+// Function to insert multiple books into the database
+const insertBooks = async (books) => {
+  const queryText = `
+    INSERT INTO books (title, author, description, imageurl, purchaseurl) 
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *;  -- This will return the inserted records
+  `;
+
+  for (const book of books) {
+    const values = [book.title, book.author, book.description, book.imageUrl, book.purchaseUrl];
+    try {
+      const res = await pool.query(queryText, values);
+      console.log('Inserted book:', res.rows[0]); // Log the inserted book
+    } catch (error) {
+      console.error('Error inserting book:', error);
+      throw error; // Throw the error to handle it later if needed
+    }
+  }
+};
+
+module.exports = { insertBooks, query };
